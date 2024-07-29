@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 50px;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#canvas {
+    display: block;
+    margin: 20px auto;
+    max-width: 80%;
+    border: 1px solid #ccc;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+.controls label,
+.controls input,
+.controls button {
+    margin: 10px;
+}

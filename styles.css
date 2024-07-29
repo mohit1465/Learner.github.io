@@ -1,0 +1,75 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#editor-container {
+    display: flex;
+    margin-top: 20px;
+    font-family: monospace;
+    overflow: hidden; /* Ensure no overflow from container */
+}
+
+#line-numbers {
+    user-select: none;
+    background: #f4f4f4;
+    border-right: 1px solid #ddd;
+    padding: 10px;
+    text-align: right;
+    color: #888;
+    line-height: 1.5em; /* Adjust line height to match textarea */
+    overflow-y: scroll; /* Enable scrolling for line numbers */
+    flex-shrink: 0; /* Ensure line numbers don't shrink */
+}
+
+textarea {
+    flex: 1; /* Take remaining space */
+    border: none;
+    padding: 10px;
+    resize: none;
+    overflow: auto;
+    outline: none;
+    line-height: 1.5em; /* Match line height with line numbers */
+    font-family: monospace; /* Ensure monospace font for consistent spacing */
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: transparent;
+    border: #007BFF 2px solid;
+    color: #007BFF;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+a button{
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+#fileInput {
+    display: none;
+}

@@ -1,0 +1,101 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to right, #3f9bfd, #007BFF);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.container {
+    margin-top: 80px;
+    margin-bottom: 60px;
+    text-align: center;
+    background: #fff;
+    width: 75%;
+    max-width: 500px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-in-out;
+}
+
+h1 {
+    font-size: 2em;
+    color: #333;
+}
+
+.input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+input[type="number"], select {
+    margin: 0 5px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+
+input[type="number"]:focus, select:focus {
+    border-color: #007BFF;
+}
+
+.button{
+    background: transparent;
+    text-decoration: none;
+    border: #007BFF 2px solid;
+    color: #007BFF;
+    padding: 15px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background: #007bff;
+    color: #fff;
+}
+
+#imagePreview {
+    max-width: 100%;
+    margin-top: 20px;
+    border-radius: 10px;
+    transition: transform 0.5s;
+}
+
+#imagePreview:hover {
+    transform: scale(1.05);
+}
+
+.back-btn{
+    position: absolute;
+    border-radius: 25px;
+    width: 43px;
+    top: 20px;
+    left: 20px;
+    background-color: #ffffff;
+    border: #ffffff 2px solid;
+    transition: .3s ease-in-out;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.227);
+    animation: fadeIn 1s ease-in-out;
+}
+
+.back-btn a img{
+    height: 40px;
+    width: 40px;
+    color: rgb(255, 255, 255);
+}
+
+.back-btn:hover{
+    border: #ffffff 2px solid;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.227);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

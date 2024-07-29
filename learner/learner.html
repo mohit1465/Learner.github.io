@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Learning Platform</title>
+    <link rel="stylesheet" href="learner.css">
+</head>
+<body>
+    <header>
+        <h1>Language Learning Platform</h1>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#courses">Courses</a></li>
+                <li><a href="#practice">Practice</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home">
+        <h2>Welcome to Your Language Learning Journey</h2>
+        <p>Explore our courses, practice exercises, and language exchange opportunities to enhance your learning experience.</p>
+    </section>
+
+    <section id="courses">
+        <h2>Courses</h2>
+        <div class="course">
+            <h3>Beginner Spanish</h3>
+            <p>Start learning Spanish from the basics. Includes vocabulary, grammar, and conversational practice.</p>
+            <button onclick="startCourse('Beginner Spanish')">Start Course</button>
+        </div>
+        <div class="course">
+            <h3>Intermediate French</h3>
+            <p>Enhance your French skills with intermediate-level lessons. Focus on grammar and complex sentences.</p>
+            <button onclick="startCourse('Intermediate French')">Start Course</button>
+        </div>
+    </section>
+
+    <section id="practice">
+        <h2>Practice Exercises</h2>
+        <div class="exercise">
+            <h3>Spanish Vocabulary Quiz</h3>
+            <button onclick="startExercise('Spanish Vocabulary Quiz')">Start Quiz</button>
+        </div>
+        <div class="exercise">
+            <h3>French Grammar Challenge</h3>
+            <button onclick="startExercise('French Grammar Challenge')">Start Challenge</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Language Learning Platform</p>
+    </footer>
+
+    <script src="learner.js"></script>
+</body>
+</html>
