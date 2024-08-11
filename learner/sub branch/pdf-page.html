@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduHub - View PDF</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;700&display=swap">
+    <link rel="stylesheet" href="../css/pdf-page.css">
+    <link rel="stylesheet" href="../css/learner.css">
+    <link rel="stylesheet" href="../css/search.css">
+    <script src="../js/learner.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo"><a href="../main.html">Learnér</a></div>
+        <div class="nav-desktop">
+            <nav>
+                <ul>
+                    <li><a href="search.html">Courses</a></li>
+                    <li><a href="learnerai.html">Talk to Learner</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="search">
+            <img id="profile-photo" src="../img/profile-photo.jpg" alt="Profile Photo">
+            <div id="user-info" class="user-menu">
+            </div>
+        </div>
+    </header>
+    <div id="pdf-info" align="center" class="pdf-info">
+        <span id="pdfname"></span>
+        <span id="class"></span>
+        <p id="title"></p>
+        <p id="rating"></p>
+    </div>
+
+    <div class="button-container" align="center">
+        <button onclick="sharePdf()">Share</button>
+        <button onclick="downloadPdf()">Download</button>
+        <a href="search.html"><button>Back to Search</button></a>
+    </div>
+
+    <embed
+        id="pdfViewer"
+        src=""
+        type="application/pdf"
+        width="100%"
+        height="100%"
+        title="Embedded PDF Viewer"
+    />
+
+    <div class="footer">
+        <div class="terms">
+            <span>Privacy Policy</span>
+            <span>Terms of Service</span>
+            <span>Contact Us</span>
+        </div>
+        <div class="social">
+            <span>Facebook</span>
+            <span>Instagram</span>
+            <span>Twitter</span>
+        </div>
+        <div class="email">
+            <span>Email: mohit8307521465@gmail.com</span>
+        </div>
+        <div class="phone">
+            <span>Phone: +91 8307521465</span>
+        </div>
+    </div>
+
+    <nav class="fixed-nav">
+        <ul>
+            <li><a href="search.html">Courses</a></li>
+            <li><a href="learnerai.html">Talk to Learner</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+        </ul>
+    </nav>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const pdfUrl = urlParams.get('pdf');
+        const pdfname = urlParams.get('name');
+        const className = urlParams.get('class');
+        const title = urlParams.get('title');
+        const rating = urlParams.get('rating');
+
+        if (pdfUrl) {
+            document.getElementById('pdfViewer').src = pdfUrl;
+        } else {
+            document.body.innerHTML = '<p>PDF URL not provided.</p>';
+        }
+
+        if (pdfname) {
+            document.getElementById('pdfname').innerHTML = pdfname;
+        } else {
+            document.body.innerHTML = '<p>PDF name not provided.</p>';
+        }
+
+        if (className) {
+            document.getElementById('class').innerHTML = `(Class: ${className})`;
+        }
+
+        if (title) {
+            document.getElementById('title').innerHTML = `Title: ${title}`;
+        }
+
+        if (rating) {
+            document.getElementById('rating').innerHTML = `Rating: ${convertRatingToStars(rating)}`;
+        }
+
+        function convertRatingToStars(rating) {
+            const maxRating = 5;
+            let stars = '';
+            for (let i = 0; i < maxRating; i++) {
+                if (i < rating) {
+                    stars += '★';
+                } else {
+                    stars += '☆';
+                }
+            }
+            return stars;
+        }
+
+        function sharePdf() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out this PDF',
+                    text: `Check out this PDF from ${className} - ${title}`,
+                    url: window.location.href
+                }).then(() => {
+                    console.log('Successful share');
+                }).catch((error) => {
+                    console.log('Error sharing', error);
+                });
+            } else {
+                alert('Web Share API is not supported in your browser.');
+            }
+        }
+        
+        function downloadPdf() {
+            const link = document.createElement('a');
+            link.href = convertToDriveDownloadUrl(pdfUrl);
+            link.download = pdfname || 'document.pdf';
+            link.target = '_self'; // Open link in a new tab/window to avoid navigating away from the current page
+            alert("The Pdf file is downloading...")
+            link.click();
+        }
+
+        function convertToDriveDownloadUrl(url) {
+            const fileIdMatch = url.match(/[-\w]{25,}/);
+            if (fileIdMatch) {
+                const fileId = fileIdMatch[0];
+                return `https://drive.google.com/uc?export=download&id=${fileId}`;
+            }
+            return url;
+        }
+        
+        function checkLogin() {
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+            const userInfo = document.getElementById('user-info');
+    
+            if (user) {
+                userInfo.innerHTML = `
+                    <h3>Hello, ${user.name}!</h3>
+                    <a href="#" id="logoutBtn">Logout</a>
+                `;
+                document.getElementById('logoutBtn')?.addEventListener('click', logout);
+            } else {
+                userInfo.innerHTML = `
+                    <h3>Hello, User!</h3>
+                    <a href="../authentication/login.html">Login</a> | 
+                    <a href="../authentication/signup.html">Sign Up</a>
+                `;
+            }
+        }
+        
+        function logout() {
+            // Remove the loggedInUser item from localStorage
+            localStorage.removeItem('loggedInUser');
+
+            // Assuming note object exists and has the relevant properties
+            const note = {
+                link: urlParams.get('pdf'),
+                subject: urlParams.get('name'),
+                class: urlParams.get('class'),
+                title: urlParams.get('title'),
+                rating: urlParams.get('rating')
+            };
+
+            // Construct the new URL with the parameters from the note object
+            const newUrl = `pdf-page.html?pdf=${encodeURIComponent(note.link)}&name=${encodeURIComponent(note.subject)}&class=${encodeURIComponent(note.class)}&title=${encodeURIComponent(note.title)}&rating=${encodeURIComponent(note.rating)}`;
+
+            // Redirect to the new URL
+            window.location.href = newUrl;
+        }
+
+        checkLogin();
+        
+    </script>
+</body>
+</html>

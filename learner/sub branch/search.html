@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;700&display=swap">
+    <title>Search Notes</title>
+    <link rel="stylesheet" href="../css/learner.css">
+    <script src="../js/learner.js"></script>
+    <link rel="stylesheet" href="../css/search.css">
+    <script src="../study-material/data.js"></script>
+</head>
+<body>
+    
+    <header class="header">
+        <div class="logo"><a href="../main.html">Learnér</a></div>
+        <div class="nav-desktop">
+            <nav>
+                <ul>
+                    <li><a href="search.html">Courses</a></li>
+                    <li><a href="learnerai.html">Talk to Learner</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="search">
+            <img id="profile-photo" src="../img/profile-photo.jpg" alt="Profile Photo">
+            <div id="user-info" class="user-menu">
+            </div>
+        </div>
+    </header>
+
+    <div id="search-container">
+        <input class="search-bar" type="text" id="search-bar" placeholder="Search notes...">
+        <div class="select-container">
+            <select id="sort-by">
+              <option value="rating">Sort by Rating</option>
+              <option value="class">Sort by Class</option>
+              <option value="subject">Sort by Subject</option>
+            </select>
+            <select id="filter-by-class">
+              <option value="">Filter by Class</option>
+              <option value="10">Class 10</option>
+              <option value="12">Class 12</option>
+              <option value="BTech CSE">BTech CSE</option>
+              <!-- Add more class options here -->
+            </select>
+          </div>          
+        <ul id="results" class="result"></ul>
+    </div>
+
+    <div class="footer">
+        <div class="terms">
+            <span>Privacy Policy</span>
+            <span>Terms of Service</span>
+            <span>Contact Us</span>
+        </div>
+        <div class="social">
+            <span>Facebook</span>
+            <span>Instagram</span>
+            <span>Twitter</span>
+        </div>
+        <div class="email">
+            <span>Email: mohit8307521465@gmail.com</span>
+        </div>
+        <div class="phone">
+            <span>Phone: +91 8307521465</span>
+        </div>
+    </div>
+
+    <nav class="fixed-nav">
+        <ul>
+            <li><a href="search.html">Courses</a></li>
+            <li><a href="learnerai.html">Talk to Learner</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+        </ul>
+    </nav>
+</body>
+<script>
+    function checkLogin() {
+        const user = JSON.parse(localStorage.getItem('loggedInUser'));
+        const userInfo = document.getElementById('user-info');
+
+        if (user) {
+            userInfo.innerHTML = `
+                <h3>Hello, ${user.name}!</h3>
+                <a href="#" id="logoutBtn">Logout</a>
+            `;
+            document.getElementById('logoutBtn')?.addEventListener('click', logout);
+        } else {
+            userInfo.innerHTML = `
+                <h3>Hello, User!</h3>
+                <a href="../authentication/login.html">Login</a> | 
+                <a href="../authentication/signup.html">Sign Up</a>
+            `;
+        }
+    }
+
+    // Logout function
+    function logout() {
+        localStorage.removeItem('loggedInUser');
+        window.location.href = 'search.html';
+    }
+
+    document.getElementById('search-bar').addEventListener('input', updateResults);
+    document.getElementById('sort-by').addEventListener('change', updateResults);
+    document.getElementById('filter-by-class').addEventListener('change', updateResults);
+
+    function updateResults() {
+        const query = document.getElementById('search-bar').value.toLowerCase();
+        const sortBy = document.getElementById('sort-by').value;
+        const filterByClass = document.getElementById('filter-by-class').value;
+
+        let filteredNotes = notes.filter(note => 
+            (note.class.toLowerCase().includes(query) || 
+            note.subject.toLowerCase().includes(query) || 
+            (note.semester && note.semester.toLowerCase().includes(query)) || 
+            note.title.toLowerCase().includes(query))
+        );
+
+        if (filterByClass) {
+            filteredNotes = filteredNotes.filter(note => note.class.toLowerCase() === filterByClass.toLowerCase());
+        }
+
+        if (sortBy === 'rating') {
+            filteredNotes.sort((a, b) => b.rating - a.rating);
+        } else if (sortBy === 'class') {
+            filteredNotes.sort((a, b) => a.class.localeCompare(b.class));
+        } else if (sortBy === 'subject') {
+            filteredNotes.sort((a, b) => a.subject.localeCompare(b.subject));
+        }
+
+        displayResults(filteredNotes);
+    }
+
+    function displayResults(results) {
+        const resultsContainer = document.getElementById('results');
+        resultsContainer.innerHTML = '';
+
+        results.forEach(note => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${note.class} ${note.subject}</strong> <span>- ${note.title}</span> <p>Rating: ${convertRatingToStars(note.rating)}</p> <a href="pdf-page.html?pdf=${note.link}&name=${note.subject}&class=${note.class}&title=${note.title}&rating=${note.rating}" target="_self">View Notes</a>`;
+
+            if (note.rating === 3) {
+                li.style.backgroundColor = 'rgb(255, 233, 161)';
+            }
+            if (note.rating === 4) {
+                li.style.backgroundColor = 'rgb(158, 255, 207)';
+            }
+            if (note.rating === 5) {
+                li.style.backgroundColor = 'rgb(158, 255, 207)';
+            }
+
+            resultsContainer.appendChild(li);
+        });
+    }
+
+    function convertRatingToStars(rating) {
+        const maxRating = 5;
+        let stars = '';
+        for (let i = 0; i < maxRating; i++) {
+            if (i < rating) {
+                stars += '★';
+            } else {
+                stars += '☆';
+            }
+        }
+        return stars;
+    }
+
+    updateResults();
+    checkLogin();
+</script>
+</html>

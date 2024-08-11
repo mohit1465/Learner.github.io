@@ -1,0 +1,91 @@
+body {
+    font-family: "Montserrat Alternates", sans-serif;
+    background-color: #000000cf;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#login, #signup {
+    width: 70%;
+    max-width: 800px;
+    background-color: #00000052;
+    color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    transition: all .2s ease-in-out;
+    text-align: center;
+}
+
+#login:hover, #signup:hover {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.064);
+}
+
+#login:hover h2, #signup:hover h2 {
+    color: #5185ff;
+}
+
+h2 {
+    transition: all .2s ease-in-out;
+    margin-bottom: 20px;
+    font-size: 40px;
+    text-align: center;
+}
+
+input {
+    font-family: "Montserrat Alternates", sans-serif;
+    width: 80%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-size: 16px;
+}
+
+input::placeholder {
+    font-family: "Montserrat Alternates", sans-serif;
+    color: #cccccc;
+}
+
+input:focus {
+    font-family: "Montserrat Alternates", sans-serif;
+    outline: none;
+    border-color: #5185ff;
+}
+
+button {
+    font-family: "Montserrat Alternates", sans-serif;
+    width: 80%;
+    padding: 15px;
+    background-color: #004cff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 15px;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+p {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+a {
+    color: #58a9ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}

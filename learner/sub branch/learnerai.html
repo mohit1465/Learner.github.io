@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online AI Chatbot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Kaushan+Script&family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/learnerai.css">
+</head>
+<body>
+    <div class="header"> 
+        <div class="left-header">
+            <div class="logo"><a href="../main.html">Learnér</a></div>
+        </div>
+        <div class="right-header">
+            <span class="date-time" id="date-time" style="color: white;"></span>
+            <label class="switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider round"></span>
+            </label>
+            <img id="profile-photo" src="../img/profile-photo.jpg" alt="Profile Photo" class="profile-photo">
+        </div>
+    </div>
+
+    <div class="user-menu" id="user-menu" style="display: none;">
+        <ul>
+            <li id="user-name">User Name</li>
+            <li><a href="../main.html">Home</a></li>
+            <li><a href="search.html">Courses</a></li>
+            <li id="logout-signup"><a></a></li>
+        </ul>
+    </div>
+
+    <div class="chat-container">
+        <div id="chat-box" class="chat-box"></div>
+        <div class="user-input-container">
+            <textarea id="user-input" placeholder="Type your message..."></textarea>
+            <button id="send-btn">
+                <img src="../img/send.png" alt="Send">
+            </button>
+        </div>        
+    </div>
+    
+    <script src="../js/learnerai.js"></script>
+</body>
+</html>
