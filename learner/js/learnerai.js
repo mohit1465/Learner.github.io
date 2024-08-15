@@ -60,21 +60,41 @@ checkLogin();
 
 // Function to load chat history based on username
 function loadChatHistory(username) {
-    let chatData = JSON.parse(localStorage.getItem(username + '_chat')) || {};
-    let chatBox = document.getElementById('chat-box');
-    chatBox.innerHTML = '';
-    for (let dateTime in chatData) {
-        addMessage(chatData[dateTime].user, "user-message");
-        addBotMessage(chatData[dateTime].eva);
-    }
+    fetch(`https://api.github.com/repos/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/contents/chat-data/${username}.json`, {
+        headers: {
+            'Authorization': 'Bearer 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'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const chatData = JSON.parse(atob(data.content));
+        let chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML = '';
+        for (let dateTime in chatData) {
+            addMessage(chatData[dateTime].user, "user-message");
+            addBotMessage(chatData[dateTime].eva);
+        }
+    })
+    .catch(error => console.error("Error loading chat history:", error));
 }
 
 // Function to save chat history based on username
 function saveChatHistory(username, userMessage, evaMessage) {
-    let chatData = JSON.parse(localStorage.getItem(username + '_chat')) || {};
-    let dateTime = new Date().toLocaleString();
-    chatData[dateTime] = { user: userMessage, eva: evaMessage };
-    localStorage.setItem(username + '_chat', JSON.stringify(chatData));
+    fetch(`https://api.github.com/repos/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/contents/chat-data/${username}.json`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': 'Bearer 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',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: 'Update chat history',
+            content: btoa(JSON.stringify({
+                [new Date().toLocaleString()]: { user: userMessage, eva: evaMessage }
+            })),
+            sha: ''  // Provide the sha of the existing file if available
+        })
+    })
+    .catch(error => console.error("Error saving chat history:", error));
 }
 
 // Function to fetch response from Groq API
@@ -103,9 +123,7 @@ function fetchGroqResponse(userInput) {
         addBotMessage(botResponse);
         saveChatHistory(currentUser.username, userInput, botResponse); // Save chat history with username
     })
-    .catch(error => {
-        console.error("Error:", error);
-    });
+    .catch(error => console.error("Error fetching Groq response:", error));
 }
 
 // Function to add user or bot messages to the chat box
@@ -164,11 +182,12 @@ document.getElementById('send-btn').addEventListener('click', () => {
     }
 });
 
+// Function to speak text
 function speakText(text) {
     fetch('https://api.deepgram.com/v1/speak?model=aura-luna-en', {
         method: 'POST',
         headers: {
-            'Authorization': 'Token 86c3974fa5e4bf7a7de5795ba9045e5021bd983d',
+            'Authorization': 'Token YOUR_DEEPGRAM_API_KEY',
             'Content-Type': 'text/plain'
         },
         body: text
@@ -197,7 +216,33 @@ function speakText(text) {
     })
     .catch(error => {
         console.error("Error:", error);
-        alert("Currently our Text to Speak function is not too good as others, An error has occured this time. We are working on it...")
+        alert("Currently our Text to Speak function is not too good as others, An error has occurred this time. We are working on it...");
     });
 }
 
+// Function to track user stay time
+let startTime = new Date();
+
+window.addEventListener('beforeunload', function() {
+    const endTime = new Date();
+    const stayDuration = Math.floor((endTime - startTime) / 1000); // Duration in seconds
+    const user = JSON.parse(localStorage.getItem('loggedInUser'));
+
+    if (user) {
+        fetch(`https://api.github.com/repos/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/contents/user-stay-time/${user.username}.json`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer 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',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: 'Update stay time',
+                content: btoa(JSON.stringify({
+                    [new Date().toLocaleDateString()]: stayDuration
+                })),
+                sha: ''  // Provide the sha of the existing file if available
+            })
+        })
+        .catch(error => console.error("Error saving stay time:", error));
+    }
+});
