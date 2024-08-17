@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Text Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/matchesonscrollbar.min.css">
+    <link rel="stylesheet" href="text-editor.css">
+</head>
+<body class="light">
+    <header>
+        <div class="header-content">
+            <div class="left-section">
+                <a href="../index.html" class="nav-button">Home</a>
+                <div class="file-dropdown">
+                    <button class="file-dropbtn">File</button>
+                    <div class="file-dropdown-content">
+                        <a href="#" id="new-file">New</a>
+                        <a href="#" id="open-file">Open</a>
+                        <a href="#" id="save-file">Save</a>
+                        <a href="#" id="save-as-file">Save As</a>
+                        <a href="#" id="save-online">Save Online</a>
+                        <a href="#" id="loadFileFromGist">Load Online</a>
+                    </div>
+                </div>
+                <div class="edit-dropdown">
+                    <button class="edit-dropbtn">Edit</button>
+                    <div class="edit-dropdown-content">
+                        <a href="#" id="change-extension">Change Extension</a>
+                        <a href="#" id="change-name">Change Name</a>
+                    </div>
+                </div>
+            </div>
+            <div class="right-section">
+                <div class="theme-dropdown">
+                    <button class="theme-dropbtn">Change Theme</button>
+                    <div class="theme-dropdown-content">
+                        <a href="#" onclick="setTheme('light')">Light</a>
+                        <a href="#" onclick="setTheme('night')">Dark</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="editor-container">
+        <div class="tabs" id="tabs"></div>
+        <textarea id="editor"></textarea>
+        <div class="suggestions"></div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div id="cursor-position">Ln: 1, Col: 1</div>
+            <div id="total-lines">Total Ln: 1</div>
+            <div id="file-size">File Size: 0 KB</div>
+        </div>
+    </footer>
+
+    <input type="file" id="file-input" style="display: none;">
+    <script src="../data.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/css-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/search.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/searchcursor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/search/matchesonscrollbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/mode/overlay.min.js"></script>
+    <script src="text-editor.js"></script>
+</body>
+</html>
