@@ -19,7 +19,7 @@ const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
 });
 
 const tabContents = {};
-const GITHUB_TOKEN = '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';
+const GITHUB_TOKEN = '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';
 
 document.getElementById('new-file').addEventListener('click', createNewFile);
 document.getElementById('open-file').addEventListener('click', handleFileOpen);
