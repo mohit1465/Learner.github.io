@@ -3,36 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Photo Editor</title>
-    <link rel="stylesheet" href="photo-editor.css">
+    <title>GitHub Gist File Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 8px;
+            font-size: 16px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Advanced Photo Editor</h1>
-        <input type="file" id="upload" accept="image/*">
-        <canvas id="canvas"></canvas>
-        <div class="controls">
-            <label for="brightness">Brightness:</label>
-            <input type="range" id="brightness" min="0" max="2" step="0.01" value="1">
-            <label for="contrast">Contrast:</label>
-            <input type="range" id="contrast" min="0" max="2" step="0.01" value="1">
-            <label for="saturation">Saturation:</label>
-            <input type="range" id="saturation" min="0" max="2" step="0.01" value="1">
-            <label for="sepia">Sepia:</label>
-            <input type="checkbox" id="sepia">
-            <label for="invert">Invert:</label>
-            <input type="checkbox" id="invert">
-            <label for="grayscale">Grayscale:</label>
-            <input type="checkbox" id="grayscale">
-            <label for="blur">Blur:</label>
-            <input type="range" id="blur" min="0" max="10" step="0.1" value="0">
-            <button id="rotate">Rotate</button>
-            <button id="flip">Flip</button>
-            <button id="draw">Draw</button>
-            <button id="erase">Erase</button>
-            <button id="save">Save</button>
-        </div>
-    </div>
-    <script src="photo-editor.js"></script>
+    <h1>GitHub Gist File Manager</h1>
+
+    <h2>Create and Save File to Gist</h2>
+    <form id="create-form">
+        <input type="text" id="file-name" placeholder="File Name" required>
+        <textarea id="file-content" placeholder="File Content" required></textarea>
+        <input type="text" id="file-id" placeholder="File ID (for access later)" required>
+        <input type="password" id="file-password" placeholder="File Password" required>
+        <button type="submit">Save to Gist</button>
+    </form>
+
+    <h2>Retrieve File from Gist</h2>
+    <form id="retrieve-form">
+        <input type="text" id="retrieve-id" placeholder="File ID" required>
+        <input type="password" id="retrieve-password" placeholder="File Password" required>
+        <button type="submit">Retrieve File</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        const GITHUB_TOKEN = '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'; // Replace with your GitHub token
+
+        document.getElementById('create-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fileName = document.getElementById('file-name').value;
+            const fileContent = document.getElementById('file-content').value;
+            const fileId = document.getElementById('file-id').value;
+            const filePassword = document.getElementById('file-password').value;
+
+            fetch('https://api.github.com/gists', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    description: 'Gist created via web page',
+                    public: false,
+                    files: {
+                        [fileName]: {
+                            content: JSON.stringify({ content: fileContent, password: filePassword })
+                        }
+                    }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerHTML = `<p>File saved! Gist URL: <a href="${data.html_url}" target="_blank">${data.html_url}</a></p>`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<p>Error saving file.</p>`;
+            });
+        });
+
+        document.getElementById('retrieve-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fileId = document.getElementById('retrieve-id').value;
+            const filePassword = document.getElementById('retrieve-password').value;
+
+            fetch(`https://api.github.com/gists/${fileId}`)
+            .then(response => response.json())
+            .then(data => {
+                const file = data.files[Object.keys(data.files)[0]].content;
+                const fileData = JSON.parse(file);
+                if (fileData.password === filePassword) {
+                    document.getElementById('result').innerHTML = `<p>File Content: ${fileData.content}</p>`;
+                } else {
+                    document.getElementById('result').innerHTML = `<p>Incorrect password.</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<p>Error retrieving file.</p>`;
+            });
+        });
+    </script>
 </body>
 </html>
