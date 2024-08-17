@@ -19,6 +19,7 @@ const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
 });
 
 const tabContents = {};
+const GITHUB_TOKEN = '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';
 
 document.getElementById('new-file').addEventListener('click', createNewFile);
 document.getElementById('open-file').addEventListener('click', handleFileOpen);
@@ -27,6 +28,8 @@ document.getElementById('save-as-file').addEventListener('click', saveAsFile);
 document.getElementById('file-input').addEventListener('change', handleFileOpen);
 document.getElementById('change-extension').addEventListener('click', changeExtension);
 document.getElementById('change-name').addEventListener('click', changeFileName);
+document.getElementById('save-online').addEventListener('click', saveFileToGist);
+document.getElementById('loadFileFromGist').addEventListener('click', loadFileFromGist);
 
 editor.on('inputRead', function(instance, changeObj) {
     const cursor = editor.getCursor();
@@ -40,7 +43,7 @@ editor.on('inputRead', function(instance, changeObj) {
     }
 });
 
-function createNewFile() {
+function createNewFile(file_name) {
     let baseName = 'Untitled';
     let ext = 'txt';
     let newName = `${baseName}.${ext}`;
@@ -231,14 +234,135 @@ async function handleFileOpen() {
     }
 }
 
+async function saveFileToGist() {
+    const fileName = prompt('Enter the file name (including extension):');
+    let fileId = prompt('Enter a unique file ID:');
+    const filePassword = prompt('Enter a file password:');
+
+    if (!fileName || !fileId || !filePassword) {
+        alert('File name, file ID, and file password are required.');
+        return;
+    }
+
+    if (await gistExists(fileId)) {
+        alert('File ID already exists. Please choose another.');
+        return;
+    }
+
+    const fileContent = editor.getValue();
+    const encryptedContent = btoa(filePassword + fileContent); // Simple encryption using Base64
+
+    const gistData = {
+        description: `File ID: ${fileId}`,
+        public: false, // Make the Gist private
+        files: {
+            [fileName]: {
+                content: encryptedContent
+            }
+        }
+    };
+
+    try {
+        const response = await fetch('https://api.github.com/gists', {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(gistData)
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            alert(`File saved online successfully. Gist ID: ${responseData.id}`);
+            localStorage.setItem(fileId, JSON.stringify({ id: responseData.id, fileName: fileName }));
+        } else {
+            alert(`Failed to save file online. Status: ${response.status} - ${response.statusText}`);
+        }
+    } catch (err) {
+        console.error('Error saving file online:', err);
+        alert('Error saving file online.');
+    }
+}
+
+async function loadFileFromGist() {
+    const fileId = prompt('Enter the file ID:');
+    const filePassword = prompt('Enter the file password:');
+
+    if (!fileId || !filePassword) {
+        alert('File ID and file password are required.');
+        return;
+    }
+
+    const storedGistData = JSON.parse(localStorage.getItem(fileId));
+
+    if (!storedGistData) {
+        alert('File ID not found. Please save the file online first.');
+        return;
+    }
+
+    const gistId = storedGistData.id;
+    const fileName = storedGistData.fileName;
+
+    try {
+        const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`
+            }
+        });
+
+        if (response.ok) {
+            const gistData = await response.json();
+            if (!gistData.files || !gistData.files[fileName]) {
+                alert('File not found in Gist!');
+                return;
+            }
+
+            const encryptedContent = gistData.files[fileName].content;
+            const decryptedContent = atob(encryptedContent);
+
+            if (decryptedContent.startsWith(filePassword)) {
+                const fileContent = decryptedContent.slice(filePassword.length);
+                
+                // Create a new tab with the file name
+                createNewFile(fileName);
+                editor.setValue(fileContent);
+                alert('File loaded successfully.');
+            } else {
+                alert('Incorrect file password.');
+            }
+        } else {
+            alert(`Failed to load file online. Status: ${response.status} - ${response.statusText}`);
+        }
+    } catch (err) {
+        console.error('Error loading file online:', err);
+        alert('Error loading file online.');
+    }
+}
+
+
+async function gistExists(fileId) {
+    try {
+        const response = await fetch(`https://api.github.com/gists/${fileId}`, {
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`
+            }
+        });
+        return response.ok;
+    } catch (err) {
+        console.error('Error checking file ID:', err);
+        return false;
+    }
+}
+
 function changeExtension() {
     const activeTab = document.querySelector('.tab.active');
     if (activeTab) {
         const newExtension = prompt('Enter the new file extension (e.g., js, txt, html):');
         if (newExtension) {
             const nameParts = activeTab.id.split('.');
-            nameParts.pop();
-            nameParts.push(newExtension);
+            nameParts.pop(); // Remove the old extension
+            nameParts.push(newExtension); // Add the new extension
             const newId = nameParts.join('.');
 
             tabContents[newId] = tabContents[activeTab.id];
@@ -247,11 +371,30 @@ function changeExtension() {
             activeTab.id = newId;
             activeTab.textContent = newId;
 
-            activeTab.appendChild(activeTab.querySelector('.close-tab'));
+            // Ensure the close button is reattached
+            const closeBtn = document.createElement('span');
+            closeBtn.textContent = '×';
+            closeBtn.className = 'close-tab';
+            closeBtn.onclick = () => {
+                if (document.querySelectorAll('.tab').length > 1) {
+                    if (confirm('Are you sure you want to close this tab?')) {
+                        delete tabContents[activeTab.id]; // Remove content of closed tab
+                        activeTab.remove();
+                        if (activeTab.classList.contains('active')) {
+                            document.querySelector('.tab').click(); // Activate first tab
+                        }
+                    }
+                } else {
+                    alert('At least one tab must be open.');
+                }
+            };
+            activeTab.appendChild(closeBtn);
+
             updateSuggestions(newId);
         }
     }
 }
+
 
 function changeFileName() {
     const activeTab = document.querySelector('.tab.active');
@@ -259,8 +402,8 @@ function changeFileName() {
         const newName = prompt('Enter the new file name (without extension):');
         if (newName) {
             const nameParts = activeTab.id.split('.');
-            const extension = nameParts.pop();
-            const newId = `${newName}.${extension}`;
+            nameParts[0] = newName; // Update the file name part
+            const newId = nameParts.join('.');
 
             tabContents[newId] = tabContents[activeTab.id];
             delete tabContents[activeTab.id];
@@ -268,11 +411,30 @@ function changeFileName() {
             activeTab.id = newId;
             activeTab.textContent = newId;
 
-            activeTab.appendChild(activeTab.querySelector('.close-tab'));
+            // Ensure the close button is reattached
+            const closeBtn = document.createElement('span');
+            closeBtn.textContent = '×';
+            closeBtn.className = 'close-tab';
+            closeBtn.onclick = () => {
+                if (document.querySelectorAll('.tab').length > 1) {
+                    if (confirm('Are you sure you want to close this tab?')) {
+                        delete tabContents[activeTab.id]; // Remove content of closed tab
+                        activeTab.remove();
+                        if (activeTab.classList.contains('active')) {
+                            document.querySelector('.tab').click(); // Activate first tab
+                        }
+                    }
+                } else {
+                    alert('At least one tab must be open.');
+                }
+            };
+            activeTab.appendChild(closeBtn);
+
             updateSuggestions(newId);
         }
     }
 }
+
 
 editor.on('cursorActivity', () => {
     const { line, ch } = editor.getCursor();
