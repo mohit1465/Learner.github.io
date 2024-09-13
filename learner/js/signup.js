@@ -1,28 +1,18 @@
-document.getElementById('signup-form').addEventListener('submit', function(event) {
+const auth = firebase.auth();
+
+// Sign Up functionality
+document.getElementById('signupForm')?.addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const name = document.getElementById('name').value;
-    const username = document.getElementById('username').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const designation = document.getElementById('designation').value;
-
-    const userData = {
-        name: name,
-        email: email,
-        password: password,
-        designation: designation,
-        rating: ""
-    };
-
-    // Save user data to individual file
-    localStorage.setItem(`user_${username}`, JSON.stringify(userData));
-
-    // Save user data to users.json
-    let users = JSON.parse(localStorage.getItem('users')) || {};
-    users[username] = userData;
-    localStorage.setItem('users', JSON.stringify(users));
-
-    alert('Signup successful!');
-    window.location.href = 'login.html';
+    
+    try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        document.getElementById('signup-response').innerText = 'Sign up successful!';
+        setTimeout(() => window.location.href = 'login.html', 1000); // Redirect after 1 second
+    } catch (error) {
+        document.getElementById('signup-response').innerText = 'Error during sign up.';
+        console.error(error);
+    }
 });
