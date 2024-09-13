@@ -34,37 +34,23 @@ async function getFileFromGitHub(path) {
     return response.json();
 }
 
+// Initialize Firebase Authentication
+const auth = firebase.auth();
+
 // Sign Up functionality
 document.getElementById('signupForm')?.addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const name = document.getElementById('name').value;
-    const username = document.getElementById('username').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const designation = document.getElementById('designation').value;
-    const dob = document.getElementById('dob').value;
-
-    const userData = {
-        name: name,
-        username: username,
-        email: email,
-        password: password,
-        designation: designation,
-        dob: dob
-    };
-
-    const filePath = `data/users/${username}.json`;
-    const fileContent = JSON.stringify(userData);
-
-    const result = await createFileInGitHub(filePath, fileContent, `Add new user: ${username}`);
-
-    if (result.content) {
+    
+    try {
+        await auth.createUserWithEmailAndPassword(email, password);
         document.getElementById('signup-response').innerText = 'Sign up successful!';
-        setTimeout(() => window.location.href = 'login.html', 1000); // Redirect after 2 seconds
-    } else {
-        document.getElementById('signup-response').innerText = 'Error during sign up. Username might already exist.';
-        console.error(result);
+        setTimeout(() => window.location.href = 'login.html', 1000); // Redirect after 1 second
+    } catch (error) {
+        document.getElementById('signup-response').innerText = 'Error during sign up.';
+        console.error(error);
     }
 });
 
@@ -72,56 +58,46 @@ document.getElementById('signupForm')?.addEventListener('submit', async function
 document.getElementById('loginForm')?.addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const username = document.getElementById('loginUsername').value;
+    const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
 
-    const filePath = `data/users/${username}.json`;
-
     try {
-        const data = await getFileFromGitHub(filePath);
-
-        if (data && data.content) {
-            const userData = JSON.parse(atob(data.content));
-
-            if (userData.password === password) {
-                localStorage.setItem('loggedInUser', JSON.stringify(userData));
-                window.location.href = '../main.html';
-            } else {
-                alert('Incorrect password.');
-            }
-        } else {
-            alert('User not found.');
-        }
+        await auth.signInWithEmailAndPassword(email, password);
+        window.location.href = '../main.html';
     } catch (error) {
-        console.error('Error during login:', error);
-        alert('An error occurred. Please try again.');
+        alert('Login failed: ' + error.message);
     }
 });
 
 // Check if a user is logged in and update UI accordingly
 function checkLogin() {
-    const user = JSON.parse(localStorage.getItem('loggedInUser'));
-    const userInfo = document.getElementById('user-info');
+    auth.onAuthStateChanged(user => {
+        const userInfo = document.getElementById('user-info');
 
-    if (user) {
-        userInfo.innerHTML = `
-            <h3>Hello, ${user.name}!</h3>
-            <a href="#" id="logoutBtn">Logout</a>
-        `;
-        document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    } else {
-        userInfo.innerHTML = `
-            <h3>Hello, User!</h3>
-            <a href="authentication/login.html">Login</a> | 
-            <a href="authentication/signup.html">Sign Up</a>
-        `;
-    }
+        if (user) {
+            userInfo.innerHTML = `
+                <h3>Hello, ${user.email}!</h3>
+                <a href="#" id="logoutBtn">Logout</a>
+            `;
+            document.getElementById('logoutBtn')?.addEventListener('click', logout);
+        } else {
+            userInfo.innerHTML = `
+                <h3>Hello, User!</h3>
+                <a href="authentication/login.html">Login</a> | 
+                <a href="authentication/signup.html">Sign Up</a>
+            `;
+        }
+    });
 }
 
 // Logout function
 function logout() {
-    localStorage.removeItem('loggedInUser');
-    window.location.href = 'main.html';
+    auth.signOut().then(() => {
+        localStorage.removeItem('loggedInUser');
+        window.location.href = 'main.html';
+    }).catch(error => {
+        console.error('Error during logout:', error);
+    });
 }
 
 // Profile Photo and User Menu Interaction
