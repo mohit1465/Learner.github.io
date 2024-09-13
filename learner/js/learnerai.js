@@ -1,28 +1,33 @@
 // Check login status
+const auth = firebase.auth();
 function checkLogin() {
-    const user = JSON.parse(localStorage.getItem('loggedInUser'));
-    const userInfo = document.getElementById('user-info');
-    const userName = document.getElementById('user-name');
-    const logoutSignup = document.getElementById('logout-signup');
+    auth.onAuthStateChanged(user => {
+        const userInfo = document.getElementById('user-info');
 
-    if (user) {
-        userName.textContent = `Hello, ${user.name}!`;
-        logoutSignup.innerHTML = '<a href="#" id="logoutBtn">Logout</a>';
-        document.getElementById('logoutBtn').addEventListener('click', logout);
-        loadChatHistory(user.username);  // Load chat history when the user logs in
-    } else {
-        userName.textContent = 'Hello, User!';
-        logoutSignup.innerHTML = `
-            <a href="../authentication/login.html">Login</a> | 
-            <a href="../authentication/signup.html">Sign Up</a>
-        `;
-    }
+        if (user) {
+            userInfo.innerHTML = `
+                <h3>Hello, ${user.email}!</h3>
+                <a href="#" id="logoutBtn">Logout</a>
+            `;
+            document.getElementById('logoutBtn')?.addEventListener('click', logout);
+        } else {
+            userInfo.innerHTML = `
+                <h3>Hello, User!</h3>
+                <a href="authentication/login.html">Login</a> | 
+                <a href="authentication/signup.html">Sign Up</a>
+            `;
+        }
+    });
 }
 
 // Logout function
 function logout() {
-    localStorage.removeItem('loggedInUser');
-    window.location.href = '../main.html';
+    auth.signOut().then(() => {
+        localStorage.removeItem('loggedInUser');
+        window.location.href = 'main.html';
+    }).catch(error => {
+        console.error('Error during logout:', error);
+    });
 }
 
 // Update date and time every second
