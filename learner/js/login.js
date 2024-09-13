@@ -1,17 +1,16 @@
-document.getElementById('login-form').addEventListener('submit', function(event) {
+// Initialize Firebase Authentication
+const auth = firebase.auth();
+// Login functionality
+document.getElementById('loginForm')?.addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
 
-    // Get user data from local storage
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-
-    if (users[username] && users[username].password === password) {
-        alert('Login successful!');
-        // Redirect to main page
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
         window.location.href = '../main.html';
-    } else {
-        alert('Invalid username or password.');
+    } catch (error) {
+        alert('Login failed: ' + error.message);
     }
 });
